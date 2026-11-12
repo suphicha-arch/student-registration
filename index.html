@@ -1,97 +1,401 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ระบบลงทะเบียนนักศึกษา</title>
-<style>
-body{font-family:Tahoma,sans-serif;max-width:760px;
-margin:30px auto;padding:0 16px}
-input,button{padding:9px;margin:4px 0;width:100%;
-box-sizing:border-box}
-button{background:#1f883d;color:#fff;border:0;
-cursor:pointer;font-size:16px}
-table{width:100%;border-collapse:collapse;margin-top:18px}
-th,td{border:1px solid #ccc;padding:7px;text-align:left}
-th{background:#eef5f1}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบลงทะเบียนนักศึกษา</title>
+  <!-- นำเข้าฟอนต์ Prompt จาก Google Fonts -->
+  <link rel="preconnect" href="https://googleapis.com">
+  <link rel="preconnect" href="https://gstatic.com" crossorigin>
+  <link href="https://googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #10b981;
+      --primary-hover: #059669;
+      --bg-color: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --danger-bg: #fef2f2;
+      --danger-text: #dc2626;
+      --danger-border: #fecaca;
+      --success-bg: #ecfdf5;
+      --success-text: #059669;
+      --success-border: #a7f3d0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Prompt', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 32px 16px;
+    }
+
+    .container {
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+
+    .header p {
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+
+    /* Card Style */
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      padding: 28px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Form Grid */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group.full-width {
+      grid-column: span 2;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: #334155;
+    }
+
+    label span.req {
+      color: #ef4444;
+    }
+
+    input {
+      font-family: 'Prompt', sans-serif;
+      font-size: 15px;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      background-color: #f8fafc;
+      color: var(--text-main);
+      transition: all 0.2s ease;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background-color: #ffffff;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    }
+
+    input::placeholder {
+      color: #94a3b8;
+    }
+
+    /* Button */
+    .btn-submit {
+      font-family: 'Prompt', sans-serif;
+      width: 100%;
+      margin-top: 20px;
+      padding: 13px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-submit:hover {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+    }
+
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+
+    .btn-submit:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    /* Alert Message */
+    .alert {
+      display: none;
+      margin-top: 16px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 400;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .alert.show {
+      display: flex;
+    }
+
+    .alert.error {
+      background-color: var(--danger-bg);
+      color: var(--danger-text);
+      border: 1px solid var(--danger-border);
+    }
+
+    .alert.success {
+      background-color: var(--success-bg);
+      color: var(--success-text);
+      border: 1px solid var(--success-border);
+    }
+
+    /* Badge */
+    .badge {
+      background-color: #e0f2fe;
+      color: #0284c7;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    /* Table */
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 14.5px;
+    }
+
+    thead {
+      background-color: #f8fafc;
+      border-bottom: 1.5px solid var(--border-color);
+    }
+
+    th {
+      padding: 13px 16px;
+      font-weight: 500;
+      color: #475569;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--border-color);
+      color: #334155;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background-color: #f8fafc;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 36px 16px;
+      color: var(--text-muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .form-group.full-width {
+        grid-column: span 1;
+      }
+      .card {
+        padding: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
-<h1>ระบบลงทะเบียนนักศึกษา</h1>
-<input id="first_name" placeholder="ชื่อ">
-<input id="last_name" placeholder="นามสกุล">
-<input id="nickname" placeholder="ชื่อเล่น">
-<input id="student_id" placeholder="เลขนักศึกษา">
-<input id="major" placeholder="สาขาวิชา">
-<button onclick="register()">ลงทะเบียน</button>
-<p id="msg"></p>
-<table>
-<thead><tr><th>#</th><th>ชื่อ-นามสกุล</th><th>ชื่อเล่น</th>
-<th>เลขนักศึกษา</th><th>สาขาวิชา</th></tr></thead>
-<tbody id="rows"></tbody>
-</table>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-// 1) เชื่อมต่อ Supabase (ใส่ค่าของตนเอง)
-const SUPABASE_URL = 'https://qbjiebgxgfxfzpzipdjm.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_1aRb9ouElfFhJp5Z6_ab7g_MRIgAzaR';
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const fields = ['first_name','last_name','nickname',
-'student_id','major'];
-const val = (id) => document.getElementById(id).value.trim();
+  <div class="container">
+    <!-- ส่วนหัวเว็บ -->
+    <div class="header">
+      <h1>🎓 ระบบลงทะเบียนนักศึกษา</h1>
+      <p>กรอกข้อมูลด้านล่างเพื่อบันทึกข้อมูลเข้าสู่ฐานข้อมูลนักศึกษา</p>
+    </div>
 
-// 2) เพิ่มข้อมูลลงทะเบียน
-async function register() {
-  const msg = document.getElementById('msg');
-  const row = {
-    first_name: val('first_name'), 
-    last_name: val('last_name'),
-    nickname: val('nickname'), 
-    student_id: val('student_id'),
-    major: val('major')
-  };
-  if (!row.first_name || !row.last_name ||
-      !row.student_id || !row.major) {
-    msg.textContent = 'กรุณากรอกข้อมูลให้ครบ';
-    return;
-  }
-  const { error } = await db.from('registrations').insert(row);
-  if (error) {
-    msg.textContent = (error.code === '23505')
-      ? 'เลขนักศึกษานี้ลงทะเบียนแล้ว'
-      : 'เกิดข้อผิดพลาด: ' + error.message;
-    return;
-  }
-  msg.textContent = 'ลงทะเบียนสำเร็จ';
-  fields.forEach((id) => document.getElementById(id).value = '');
-  loadRows();
-}
+    <!-- การ์ดฟอร์มกรอกข้อมูล -->
+    <div class="card">
+      <div class="card-title">
+        <span>📝 แบบฟอร์มลงทะเบียน</span>
+      </div>
 
-// 3) ดึงข้อมูลมาแสดงเป็นตาราง
-async function loadRows() {
-  const { data, error } = await db.from('registrations')
-    .select('*').order('id', { ascending: false });
-  if (error) {
-    document.getElementById('msg').textContent =
-      'อ่านข้อมูลไม่ได้: ' + error.message;
-    return;
-  }
-  const tb = document.getElementById('rows');
-  tb.innerHTML = '';
-  data.forEach((r) => {
-    const tr = document.createElement('tr');
-    [r.id, r.first_name + ' ' + r.last_name, r.nickname || '-',
-     r.student_id, r.major].forEach((v) => {
-      const td = document.createElement('td');
-      td.textContent = v;
-      tr.appendChild(td);
-    });
-    tb.appendChild(tr);
-  });
-}
+      <form id="regForm" onsubmit="event.preventDefault(); register();">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="first_name">ชื่อ <span class="req">*</span></label>
+            <input id="first_name" type="text" placeholder="เช่น สมชาย">
+          </div>
 
-loadRows();
-</script>
-</body>
-</html>
+          <div class="form-group">
+            <label for="last_name">นามสกุล <span class="req">*</span></label>
+            <input id="last_name" type="text" placeholder="เช่น ใจดี">
+          </div>
+
+          <div class="form-group">
+            <label for="nickname">ชื่อเล่น</label>
+            <input id="nickname" type="text" placeholder="เช่น ชาย (ไม่บังคับ)">
+          </div>
+
+          <div class="form-group">
+            <label for="student_id">รหัสนักศึกษา <span class="req">*</span></label>
+            <input id="student_id" type="text" placeholder="เช่น 66010001">
+          </div>
+
+          <div class="form-group full-width">
+            <label for="major">สาขาวิชา <span class="req">*</span></label>
+            <input id="major" type="text" placeholder="เช่น วิทยาการคอมพิวเตอร์">
+          </div>
+        </div>
+
+        <button id="submitBtn" type="submit" class="btn-submit">บันทึกข้อมูลลงทะเบียน</button>
+      </form>
+
+      <!-- กล่องข้อความแจ้งเตือน -->
+      <div id="msgBox" class="alert"></div>
+    </div>
+
+    <!-- การ์ดตารางแสดงผล -->
+    <div class="card">
+      <div class="card-title">
+        <span>📋 รายชื่อนักศึกษาที่ลงทะเบียนแล้ว</span>
+        <span id="totalCount" class="badge">ทั้งหมด 0 คน</span>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 60px;">#</th>
+              <th>ชื่อ - นามสกุล</th>
+              <th>ชื่อเล่น</th>
+              <th>รหัสนักศึกษา</th>
+              <th>สาขาวิชา</th>
+            </tr>
+          </thead>
+          <tbody id="rows">
+            <tr>
+              <td colspan="5" class="empty-state">กำลังโหลดข้อมูล...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // 1) เชื่อมต่อ Supabase
+    const SUPABASE_URL = 'https://qbjiebgxgfxfzpzipdjm.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_1aRb9ouElfFhJp5Z6_ab7g_MRIgAzaR';
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const fields = ['first_name', 'last_name', 'nickname', 'student_id', 'major'];
+    const val = (id) => document.getElementById(id).value.trim();
+
+    // ฟังก์ชันแสดงกล่องข้อความแจ้งเตือน
+    function showAlert(message, type = 'success') {
+      const msgBox = document.getElementById('msgBox');
+      msgBox.textContent = (type === 'success' ? '✅ ' : '⚠️ ') + message;
+      msgBox.className = `alert show ${type}`;
+      
+      // ซ่อนข้อความอัตโนมัติใน 4 วินาทีหากสำเร็จ
+      if (type === 'success') {
+        setTimeout(() => {
+          msgBox.classList.remove('show');
+        }, 4000);
+      }
+    }
+
+    // 2) เพิ่มข้อมูลลงทะเบียน
+    async function register() {
+      const btn = document.getElementById('submitBtn');
+      const row = {
+        first_name: val('first_name'),
+        last_name: val('last_name'),
+        nickname: val('nickname'),
+        student_id: val('student_id'),
+        major: val('major')
+      };
+
+      if (!row.first_name || !row.last_name || !row.student_id || !row.major) {
+        showAlert('กรุณากรอกข้อมูลในช่องที่มีเครื่องหมาย * ให้ครบถ้วน', 'error');
+        return;
+      }
+
+      // ปิดปุ่มชั่วคราวระหว่างกำลังบันทึก
+      btn.disabled = true;
+      btn.textContent = 'กำลังบันทึกข้อมูล...';
+
+      const { error } = await db.from('registrations').insert(row);
+
+      btn.disabled = false;
+      btn.textContent = 'บันทึกข้อมูลลงทะเบียน';
+
+      if (error) {
+        const errMsg = (error.code === '23505')
+          ? 'รหัสนักศึกษานี้ถูกลงทะเบียนในระบบแล้ว'
+          : 'เกิดข้อผิดพลาด: ' + error.message;
+        showAlert(errMsg, 'error');
+        return;
+      }
+
